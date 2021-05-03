@@ -1,0 +1,22 @@
+{
+  "name": "@mikro-cms/api-v1",
+  "version": "0.0.1",
+  "description": "Pakcage api v1 mikro-cms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikro-cms/api-v1.git"
+  },
+  "keywords": [
+    "mikro-cms"
+  ],
+  "author": "mikro-cms",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikro-cms/api-v1/issues"
+  },
+  "homepage": "https://github.com/mikro-cms/api-v1#readme"
+}
