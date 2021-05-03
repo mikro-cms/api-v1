@@ -51,7 +51,7 @@ async function handlerRegister(req, res) {
   const newUser = new modelUser({
     'user_email': req.body.email,
     'user_username': req.body.username,
-    'password': password,
+    'user_password': password,
     'role': roleMember._id
   });
 
