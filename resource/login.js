@@ -44,7 +44,7 @@ async function handlerLogin(req, res) {
   await newSession.save();
 
   res.cookie('token', token, {
-    expires: process.env.SESSION_EXPIRES * (1000 * 60),
+    maxAge: process.env.SESSION_EXPIRES * (1000 * 60),
     path: '/'
   }).json({
     message: res.trans('user.login_success')
