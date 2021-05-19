@@ -49,6 +49,7 @@ async function handlerRegister(req, res) {
   const password = crypto.createHash('md5').update(req.body.password).digest('hex');
 
   const newUser = new modelUser({
+    'user_fullname': req.body.fullname,
     'user_email': req.body.email,
     'user_username': req.body.username,
     'user_password': password,
@@ -63,6 +64,9 @@ async function handlerRegister(req, res) {
 }
 
 module.exports = [
+  body('fullname')
+    .exists({ checkFalsy: true }).withMessage('user.fullname_required')
+    .isLength({ min: 1, max: 128 }).withMessage('user.fullname_limit'),
   body('email')
     .exists({ checkFalsy: true }).withMessage('user.email_required')
     .isEmail().withMessage('user.email_format'),
