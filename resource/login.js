@@ -47,7 +47,8 @@ async function handlerLogin(req, res) {
     maxAge: process.env.SESSION_EXPIRES * (1000 * 60),
     path: '/'
   }).json({
-    message: res.trans('user.login_success')
+    message: res.trans('user.login_success'),
+    token: token
   });
 }
 
