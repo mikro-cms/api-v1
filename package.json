@@ -1,6 +1,6 @@
 {
   "name": "@mikro-cms/api-v1",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Pakcage api v1 mikro-cms",
   "main": "index.js",
   "scripts": {
