@@ -12,5 +12,12 @@ module.exports = {
       role_group: 'guest'
     },
     handler: require('./register')
+  },
+  '/user': {
+    method: 'get',
+    permission: {
+      role_group: 'member'
+    },
+    handler: require('./user')
   }
 };
