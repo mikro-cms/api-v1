@@ -5,7 +5,7 @@ const modelSession = require('@mikro-cms/models/session');
 
 async function handlerLogin(req, res) {
   if (typeof res.locals.session.token !== 'undefined') {
-    return res.json({
+    return res.status(400).json({
       message: res.trans('user.login_failed')
     });
   }

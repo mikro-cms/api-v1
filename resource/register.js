@@ -5,7 +5,7 @@ const role = require('@mikro-cms/models/role');
 
 async function handlerRegister(req, res) {
   if (typeof res.locals.session.token !== 'undefined') {
-    return res.json({
+    return res.status(400).json({
       message: res.trans('user.register_failed')
     });
   }
