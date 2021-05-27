@@ -32,17 +32,21 @@ async function handlerLogin(req, res) {
   const token = crypto.createHash('md5')
                   .update(crypto.randomBytes(48).toString())
                   .digest('hex');
+  const currentTime = Date.now();
   const maxAge = process.env.SESSION_EXPIRES * (1000 * 60);
 
   const newSession = new modelSession({
-    'expired': Date.now() + maxAge,
+    'expired': currentTime + maxAge,
     'device': '',
     'ip': '',
     'token': token,
     'user': user._id
   });
 
+  user.last_login = currentTime;
+
   await newSession.save();
+  await user.save();
 
   res.cookie('token', token, {
     maxAge: maxAge,
