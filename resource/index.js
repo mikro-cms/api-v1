@@ -56,5 +56,37 @@ module.exports = {
       },
       handler: require('./users')
     }
+  },
+  '/apis': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./apis')
+    }
+  },
+  '/api': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./api')
+    }
+  },
+  '/resources': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./resources')
+    }
+  },
+  '/resource': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./resource')
+    }
   }
 };
