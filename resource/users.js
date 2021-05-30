@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator/check');
+const { query, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const mockUser = require('./mock/user');
 
@@ -49,28 +49,28 @@ async function handlerUsers(req, res) {
     }
   }
 
-  const total = await modelUser.countDocuments();
+  const totalUsers = await modelUser.countDocuments(query);
 
   res.json({
     users: users,
-    total: total
+    total: totalUsers
   });
 }
 
 module.exports = [
-  body('offset')
+  query('offset')
     .optional()
     .isNumeric(),
-  body('length')
+  query('length')
     .optional()
     .isNumeric(),
-  body('fullname')
+  query('fullname')
     .optional()
     .isLength({ min: 1, max: 128 }).withMessage('user.fullname_limit'),
-  body('email')
+  query('email')
     .optional()
     .isEmail().withMessage('user.email_format'),
-  body('username')
+  query('username')
     .optional()
     .isLength({ min: 3, max: 16 }).withMessage('user.username_limit')
     .isAlphanumeric().withMessage('user.username_format'),
