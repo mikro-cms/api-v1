@@ -17,6 +17,7 @@ async function handlerResource(req, res) {
 
   const resource = await modelApiPermission.findOne(query, [
     '_id',
+    'role',
     'role_group',
     'api_resource',
     'api_method'
@@ -30,6 +31,6 @@ async function handlerResource(req, res) {
 module.exports = [
   query('resource_id')
     .exists({ checkFalsy: false }).withMessage('api.resource_id_required')
-    .isAlphanumeric(),
+    .isAlphanumeric().withMessage('api.edit_resource_failed'),
   handlerResource
 ];
