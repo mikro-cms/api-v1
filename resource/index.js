@@ -87,6 +87,20 @@ module.exports = {
         role_group: '(admin)'
       },
       handler: require('./resource')
+    },
+    'put': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./resource-edit')
+    }
+  },
+  '/roles': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./roles')
     }
   }
 };
