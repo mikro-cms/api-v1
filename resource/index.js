@@ -102,5 +102,13 @@ module.exports = {
       },
       handler: require('./roles')
     }
+  },
+  '/pages': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./pages')
+    }
   }
 };
