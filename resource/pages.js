@@ -1,5 +1,5 @@
 const { query, validationResult } = require('express-validator/check');
-const modelPage = require('@mikro-cms/models/page');
+const modelPagePermission = require('@mikro-cms/models/page-permission');
 const mockPage = require('./mock/page');
 
 async function handlerPages(req, res) {
@@ -15,12 +15,15 @@ async function handlerPages(req, res) {
   const length = req.query.length || 10;
   const query = {};
 
-  const pages = await modelPage.find(query, [
+  const pages = await modelPagePermission.find(query, [
     '_id',
-    'page_url',
-    'page_title',
-    'variant'
+    'role',
+    'role_group'
   ])
+  .populate({
+    path: 'page',
+    select: '_id page_url page_title theme variant'
+  })
   .skip(parseInt(offset))
   .limit(parseInt(length));
 
@@ -34,7 +37,7 @@ async function handlerPages(req, res) {
     }
   }
 
-  const totalPages = await modelPage.countDocuments(query);
+  const totalPages = await modelPagePermission.countDocuments(query);
 
   res.json({
     pages: pages,

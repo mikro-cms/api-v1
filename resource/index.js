@@ -57,6 +57,34 @@ module.exports = {
       handler: require('./users')
     }
   },
+  '/page': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./page')
+    },
+    'post': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./page-add')
+    },
+    'put': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./page-edit')
+    }
+  },
+  '/pages': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./pages')
+    }
+  },
   '/apis': {
     'get': {
       permission: {
@@ -103,12 +131,12 @@ module.exports = {
       handler: require('./roles')
     }
   },
-  '/pages': {
+  '/themes': {
     'get': {
       permission: {
         role_group: '(admin)'
       },
-      handler: require('./pages')
+      handler: require('./themes')
     }
   }
 };
