@@ -22,7 +22,12 @@ async function handlerPages(req, res) {
   ])
   .populate({
     path: 'page',
-    select: '_id page_url page_title theme variant'
+    select: '_id page_url page_title theme variant',
+    populate: {
+      path: 'theme',
+      model: 'theme',
+      select: 'theme_customize'
+    }
   })
   .skip(parseInt(offset))
   .limit(parseInt(length));
