@@ -138,5 +138,13 @@ module.exports = {
       },
       handler: require('./themes')
     }
+  },
+  '/customize': {
+    'get': {
+      permission: {
+        role_group: '(admin)'
+      },
+      handler: require('./page-customize')
+    }
   }
 };
