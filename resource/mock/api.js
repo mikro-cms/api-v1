@@ -9,7 +9,7 @@ module.exports = function (api) {
     'api_url': api.api_url,
     'api_path': api.api_path,
     'api_info': api.api_info,
-    'api_path_options': api.api_path_options,
+    'api_options': api.api_options,
     'api_resource': api.api_resource
-  }
+  };
 }

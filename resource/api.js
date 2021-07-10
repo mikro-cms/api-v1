@@ -23,7 +23,7 @@ async function handlerApi(req, res) {
     'api_url',
     'api_path',
     'api_info',
-    'api_path_options',
+    'api_options',
     'api_resource'
   ]);
 
