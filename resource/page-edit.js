@@ -42,7 +42,7 @@ async function handlerPageEdit(req, res) {
 
   res.json({
     message: res.trans('page.edit_page_success'),
-    page: mockPage(createdPage)
+    page: mockPage(editedPage)
   });
 }
 
