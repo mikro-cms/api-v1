@@ -4,13 +4,16 @@ const modelUser = require('@mikro-cms/models/user');
 const modelRole = require('@mikro-cms/models/role');
 const mockUser = require('./mock/user');
 
-async function handlerUserAdd(req, res) {
+async function handlerUserAdd(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const emailRegistered = await modelUser.findOne({
@@ -18,9 +21,12 @@ async function handlerUserAdd(req, res) {
   }).exec();
 
   if (emailRegistered !== null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.email_taken')
-    });
+    };
+
+    return next();
   }
 
   const usernameRegistered = await modelUser.findOne({
@@ -28,17 +34,23 @@ async function handlerUserAdd(req, res) {
   }).exec();
 
   if (usernameRegistered !== null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.username_taken')
-    });
+    };
+
+    return next();
   }
 
   const roleMember = await modelRole.findOne({ 'role_name': 'member' }).exec();
 
   if (roleMember === null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.add_new_user_failed')
-    });
+    };
+
+    return next();
   }
 
   const password = crypto.createHash('md5').update(req.body.password).digest('hex');
@@ -56,10 +68,12 @@ async function handlerUserAdd(req, res) {
 
   newUser.role = roleMember;
 
-  res.json({
-    message: res.trans('user.add_new_user_success'),
-    user: mockUser(newUser)
-  });
+  res.result = {
+    'message': res.trans('user.add_new_user_success'),
+    'user': mockUser(newUser)
+  };
+
+  return next();
 }
 
 module.exports = [

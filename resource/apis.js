@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelApi = require('@mikro-cms/models/api');
 const mockApi = require('./mock/api');
 
-async function handlerApis(req, res) {
+async function handlerApis(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const offset = req.query.offset || 0;
@@ -30,21 +33,26 @@ async function handlerApis(req, res) {
   .limit(parseInt(length));
 
   if (apis === null) {
-    res.json({ apis: [], total: 0 });
+    res.result = {
+      'apis': [],
+      'total': 0
+    };
   } else {
     for (var apiIndex in apis) {
       let api = apis[apiIndex];
 
       apis[apiIndex] = mockApi(api);
     }
+
+    const totalApis = await modelApi.countDocuments(query);
+
+    res.result = {
+      'apis': apis,
+      'total': totalApis
+    };
   }
 
-  const totalApis = await modelApi.countDocuments(query);
-
-  res.json({
-    apis: apis,
-    total: totalApis
-  });
+  return next();
 }
 
 module.exports = [

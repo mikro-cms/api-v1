@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelTheme = require('@mikro-cms/models/theme');
 const mockTheme = require('./mock/theme');
 
-async function handlerThemes(req, res) {
+async function handlerThemes(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const offset = req.query.offset || 0;
@@ -27,21 +30,26 @@ async function handlerThemes(req, res) {
   .limit(parseInt(length));
 
   if (themes === null) {
-    res.json({ themes: [], total: 0 });
+    res.result = {
+      'themes': [],
+      'total': 0
+    };
   } else {
     for (var themeIndex in themes) {
       let theme = themes[themeIndex];
 
       themes[themeIndex] = mockTheme(theme);
     }
+
+    const totalThemes = await modelTheme.countDocuments(query);
+
+    res.result = {
+      'themes': themes,
+      'total': totalThemes
+    };
   }
 
-  const totalThemes = await modelTheme.countDocuments(query);
-
-  res.json({
-    themes: themes,
-    total: totalThemes
-  });
+  return next();
 }
 
 module.exports = [

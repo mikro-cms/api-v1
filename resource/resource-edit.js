@@ -2,13 +2,16 @@ const { body, validationResult } = require('express-validator/check');
 const modelApiPermission = require('@mikro-cms/models/api-permission');
 const mockResource = require('./mock/resource');
 
-async function handlerResourceEdit(req, res) {
+async function handlerResourceEdit(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const resource = await modelApiPermission.findOne({
@@ -16,11 +19,12 @@ async function handlerResourceEdit(req, res) {
   });
 
   if (resource === null) {
-    res.status(400).json({
-      message: res.trans('api.resource_not_found')
-    });
+    res.result = {
+      'status': 400,
+      'message': res.trans('api.resource_not_found')
+    };
 
-    return;
+    return next();
   }
 
   if (req.body.role_id) {
@@ -37,10 +41,12 @@ async function handlerResourceEdit(req, res) {
 
   await resource.save();
 
-  res.json({
-    resource: mockResource(resource),
-    message: res.trans('api.edit_resource_success')
-  });
+  res.result = {
+    'resource': mockResource(resource),
+    'message': res.trans('api.edit_resource_success')
+  };
+
+  return next();
 }
 
 module.exports = [

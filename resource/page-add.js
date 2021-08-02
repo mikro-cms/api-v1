@@ -2,13 +2,16 @@ const { plugin } = require('@mikro-cms/core/apis');
 const { body, validationResult } = require('express-validator/check');
 const mockPage = require('./mock/page');
 
-async function handlerPageAdd(req, res) {
+async function handlerPageAdd(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const pageOptions = {
@@ -34,15 +37,18 @@ async function handlerPageAdd(req, res) {
   const createdPage = await plugin.createPage(pageOptions);
 
   if (!createdPage) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('page.add_new_page_failed')
-    });
+    };
+  } else {
+    res.result = {
+      'message': res.trans('page.add_new_page_success'),
+      'page': mockPage(createdPage)
+    };
   }
 
-  res.json({
-    message: res.trans('page.add_new_page_success'),
-    page: mockPage(createdPage)
-  });
+  return next();
 }
 
 module.exports = [

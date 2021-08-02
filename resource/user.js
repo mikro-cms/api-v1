@@ -1,11 +1,13 @@
 const mockUser = require('./mock/user');
 
-function handlerUser(req, res) {
+function handlerUser(req, res, next) {
   const user = res.locals.session.user;
 
-  res.json({
-    user: mockUser(user)
-  });
+  res.result = {
+    'user': mockUser(user)
+  };
+
+  return next();
 }
 
 module.exports = [

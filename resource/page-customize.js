@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const utils = require('@mikro-cms/core/utils');
 const modelPage = require('@mikro-cms/models/page');
 
-async function handlerPageCustomize(req, res) {
+async function handlerPageCustomize(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const query = {

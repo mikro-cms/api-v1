@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const mockUser = require('./mock/user');
 
-async function handlerUserDelete(req, res) {
+async function handlerUserDelete(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const selectedUser = await modelUser.findOne({
@@ -16,9 +19,12 @@ async function handlerUserDelete(req, res) {
   }).exec();
 
   if (selectedUser === null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.user_not_found')
-    });
+    };
+
+    return next();
   }
 
   if (selectedUser.deleted_at !== null) {
@@ -35,6 +41,8 @@ async function handlerUserDelete(req, res) {
     message: res.trans('user.delete_user_success'),
     user: mockUser(selectedUser)
   });
+
+  return next();
 }
 
 module.exports = [

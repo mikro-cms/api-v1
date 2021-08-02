@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelApiPermission = require('@mikro-cms/models/api-permission');
 const mockResource = require('./mock/resource');
 
-async function handlerResource(req, res) {
+async function handlerResource(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const query = {
@@ -23,9 +26,11 @@ async function handlerResource(req, res) {
     'api_method'
   ]);
 
-  res.json({
-    resource: mockResource(resource)
-  });
+  res.result = {
+    'resource': mockResource(resource)
+  };
+
+  return next();
 }
 
 module.exports = [

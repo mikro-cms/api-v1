@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const mockUser = require('./mock/user');
 
-async function handlerUsers(req, res) {
+async function handlerUsers(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const offset = req.query.offset || 0;
@@ -40,7 +43,12 @@ async function handlerUsers(req, res) {
   .limit(parseInt(length));
 
   if (users === null) {
-    res.json({ users: [], total: 0 });
+    res.result = {
+      'users': [],
+      'total': 0
+    };
+
+    return next();
   } else {
     for (var userIndex in users) {
       let user = users[userIndex];
@@ -51,10 +59,12 @@ async function handlerUsers(req, res) {
 
   const totalUsers = await modelUser.countDocuments(query);
 
-  res.json({
-    users: users,
-    total: totalUsers
-  });
+  res.result = {
+    'users': users,
+    'total': totalUsers
+  };
+
+  return next();
 }
 
 module.exports = [

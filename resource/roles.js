@@ -2,13 +2,16 @@ const { query, validationResult } = require('express-validator/check');
 const modelRole = require('@mikro-cms/models/role');
 const mockRole = require('./mock/role');
 
-async function handlerRoles(req, res) {
+async function handlerRoles(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const offset = req.query.offset || 0;
@@ -24,21 +27,26 @@ async function handlerRoles(req, res) {
   .limit(parseInt(length));
 
   if (roles === null) {
-    res.json({ roles: [], total: 0 });
+    res.result = {
+      'roles': [],
+      'total': 0
+    };
   } else {
     for (var roleIndex in roles) {
       let role = roles[roleIndex];
 
       roles[roleIndex] = mockRole(role);
     }
+
+    const totalRoles = await modelRole.countDocuments(query);
+
+    res.result = {
+      'roles': roles,
+      'total': totalRoles
+    };
   }
 
-  const totalRoles = await modelRole.countDocuments(query);
-
-  res.json({
-    roles: roles,
-    total: totalRoles
-  });
+  return next();
 }
 
 module.exports = [

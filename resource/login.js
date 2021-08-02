@@ -3,19 +3,25 @@ const { body, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const modelSession = require('@mikro-cms/models/session');
 
-async function handlerLogin(req, res) {
+async function handlerLogin(req, res, next) {
   if (typeof res.locals.session.token !== 'undefined') {
-    return res.status(400).json({
-      message: res.trans('user.login_failed')
-    });
+    res.result = {
+      'status': 400,
+      'message': res.trans('user.login_failed')
+    };
+
+    return next();
   }
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const user = await modelUser.findOne({
@@ -24,9 +30,12 @@ async function handlerLogin(req, res) {
   }).exec();
 
   if (user === null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.invalid_username_or_password')
-    });
+    };
+
+    return next();
   }
 
   const token = crypto.createHash('md5')
@@ -51,10 +60,14 @@ async function handlerLogin(req, res) {
   res.cookie('token', token, {
     maxAge: maxAge,
     path: '/'
-  }).json({
-    message: res.trans('user.login_success'),
-    token: token
   });
+
+  res.result = {
+    'message': res.trans('user.login_success'),
+    'token': token
+  };
+
+  return next();
 }
 
 module.exports = [

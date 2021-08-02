@@ -3,19 +3,25 @@ const { body, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const role = require('@mikro-cms/models/role');
 
-async function handlerRegister(req, res) {
+async function handlerRegister(req, res, next) {
   if (typeof res.locals.session.token !== 'undefined') {
-    return res.status(400).json({
-      message: res.trans('user.register_failed')
-    });
+    res.result = {
+      'status': 400,
+      'message': res.trans('user.register_failed')
+    };
+
+    return next();
   }
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const emailRegistered = await modelUser.findOne({
@@ -23,9 +29,12 @@ async function handlerRegister(req, res) {
   }).exec();
 
   if (emailRegistered !== null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.email_taken')
-    });
+    };
+
+    return next();
   }
 
   const usernameRegistered = await modelUser.findOne({
@@ -33,17 +42,23 @@ async function handlerRegister(req, res) {
   }).exec();
 
   if (usernameRegistered !== null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.username_taken')
-    });
+    };
+
+    return next();
   }
 
   const roleMember = await role.findOne({ 'role_name': 'member' }).exec();
 
   if (roleMember === null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.register_failed')
-    });
+    };
+
+    return next();
   }
 
   const password = crypto.createHash('md5').update(req.body.password).digest('hex');
@@ -58,9 +73,11 @@ async function handlerRegister(req, res) {
 
   await newUser.save();
 
-  res.json({
-    message: res.trans('user.register_success')
-  });
+  res.result = {
+    'message': res.trans('user.register_success')
+  };
+
+  return next();
 }
 
 module.exports = [

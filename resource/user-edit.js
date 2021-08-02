@@ -3,13 +3,16 @@ const { body, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
 const mockUser = require('./mock/user');
 
-async function handlerUserEdit(req, res) {
+async function handlerUserEdit(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.transValidator(errors.array({ onlyFirstError: true }))
-    });
+    };
+
+    return next();
   }
 
   const selectedUser = await modelUser.findOne({
@@ -17,9 +20,12 @@ async function handlerUserEdit(req, res) {
   }).exec();
 
   if (selectedUser === null) {
-    return res.status(400).json({
+    res.result = {
+      'status': 400,
       'message': res.trans('user.user_not_found')
-    });
+    };
+
+    return next();
   }
 
   if (req.body.email) {
@@ -28,9 +34,12 @@ async function handlerUserEdit(req, res) {
     }).exec();
 
     if (emailRegistered !== null) {
-      return res.status(400).json({
+      res.result = {
+        'status': 400,
         'message': res.trans('user.email_taken')
-      });
+      };
+
+      return next();
     } else {
       selectedUser.user_email = req.body.email;
     }
@@ -42,9 +51,12 @@ async function handlerUserEdit(req, res) {
     }).exec();
 
     if (usernameRegistered !== null) {
-      return res.status(400).json({
+      res.result = {
+        'status': 400,
         'message': res.trans('user.username_taken')
-      });
+      };
+
+      return next();
     } else {
       selectedUser.user_username = req.body.user_username;
     }
@@ -59,10 +71,12 @@ async function handlerUserEdit(req, res) {
 
   await selectedUser.save();
 
-  res.json({
-    message: res.trans('user.edit_user_success'),
-    user: mockUser(selectedUser)
-  });
+  res.result = {
+    'message': res.trans('user.edit_user_success'),
+    'user': mockUser(selectedUser)
+  };
+
+  return next();
 }
 
 module.exports = [
