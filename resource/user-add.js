@@ -1,18 +1,10 @@
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator/check');
 const modelUser = require('@mikro-cms/models/user');
-const role = require('@mikro-cms/models/role');
+const modelRole = require('@mikro-cms/models/role');
+const mockUser = require('./mock/user');
 
-async function handlerRegister(req, res, next) {
-  if (typeof res.locals.session.token !== 'undefined') {
-    res.result = {
-      'status': 400,
-      'message': res.trans('user.register_failed')
-    };
-
-    return next();
-  }
-
+async function handlerUserAdd(req, res, next) {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -50,12 +42,12 @@ async function handlerRegister(req, res, next) {
     return next();
   }
 
-  const roleMember = await role.findOne({ 'role_name': 'member' }).exec();
+  const roleMember = await modelRole.findOne({ 'role_name': 'member' }).exec();
 
   if (roleMember === null) {
     res.result = {
       'status': 400,
-      'message': res.trans('user.register_failed')
+      'message': res.trans('user.add_new_user_failed')
     };
 
     return next();
@@ -64,6 +56,7 @@ async function handlerRegister(req, res, next) {
   const password = crypto.createHash('md5').update(req.body.password).digest('hex');
 
   const newUser = new modelUser({
+    'created_by': res.locals.session.user._id,
     'user_fullname': req.body.fullname,
     'user_email': req.body.email,
     'user_username': req.body.username,
@@ -73,8 +66,11 @@ async function handlerRegister(req, res, next) {
 
   await newUser.save();
 
+  newUser.role = roleMember;
+
   res.result = {
-    'message': res.trans('user.register_success')
+    'message': res.trans('user.add_new_user_success'),
+    'user': mockUser(newUser)
   };
 
   return next();
@@ -94,5 +90,5 @@ module.exports = [
   body('password')
     .exists({ checkFalsy: true }).withMessage('user.password_required')
     .isLength({ min: 3, max: 16 }).withMessage('user.password_limit'),
-  handlerRegister
+  handlerUserAdd
 ];
