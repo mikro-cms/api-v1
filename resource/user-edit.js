@@ -58,12 +58,12 @@ async function handlerUserEdit(req, res, next) {
 
       return next();
     } else {
-      selectedUser.user_username = req.body.user_username;
+      selectedUser.user_username = req.body.username;
     }
   }
 
   if (req.body.password) {
-    selectedUser.password = crypto.createHash('md5').update(req.body.password).digest('hex');
+    selectedUser.user_password = crypto.createHash('md5').update(req.body.password).digest('hex');
   }
 
   selectedUser.updated_by = res.locals.session.user._id;
